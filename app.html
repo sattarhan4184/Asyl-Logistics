@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ASYL LOGISTICS</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #0f172a);
+            --text-color: var(--tg-theme-text-color, #f8fafc);
+            --hint-color: var(--tg-theme-hint-color, #94a3b8);
+            --button-color: var(--tg-theme-button-color, #2563eb);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
+            --card-bg: var(--tg-theme-secondary-bg-color, #1e293b);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Переключатель языков */
+        .lang-switch {
+            display: flex;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .lang-btn {
+            background: transparent;
+            color: var(--hint-color);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--button-color);
+            color: var(--button-text);
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            scrollbar-width: none;
+        }
+
+        .filter-btn {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--button-color);
+            color: var(--button-text);
+        }
+
+        .catalog {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.15s ease;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card-badge {
+            background: rgba(37, 99, 235, 0.15);
+            color: #60a5fa;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--hint-color);
+            line-height: 1.4;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .card-price {
+            font-weight: 700;
+            font-size: 14px;
+            color: #38bdf8;
+        }
+
+        .select-btn {
+            background: var(--button-color);
+            color: var(--button-text);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        #loader {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .skeleton {
+            height: 90px;
+            background: linear-gradient(90deg, var(--card-bg) 25%, rgba(255,255,255,0.05) 50%, var(--card-bg) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 14px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="brand">
+            <div class="brand-icon">🚛</div>
+            <span>ASYL LOGISTICS</span>
+        </div>
+        <!-- Переключатель языков -->
+        <div class="lang-switch">
+            <button class="lang-btn" onclick="setLanguage('kk', event)">ҚАЗ</button>
+            <button class="lang-btn active" onclick="setLanguage('ru', event)">РУС</button>
+            <button class="lang-btn" onclick="setLanguage('en', event)">ENG</button>
+        </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="filters">
+        <button class="filter-btn active" id="f-all" onclick="filterCatalog('all', event)">Все услуги</button>
+        <button class="filter-btn" id="f-evac" onclick="filterCatalog('evac', event)">🚨 Эвакуаторы</button>
+        <button class="filter-btn" id="f-city" onclick="filterCatalog('city', event)">Городские</button>
+        <button class="filter-btn" id="f-intercity" onclick="filterCatalog('intercity', event)">Межгород / СНГ</button>
+        <button class="filter-btn" id="f-spec" onclick="filterCatalog('spec', event)">Спецтехника</button>
+    </div>
+
+    <div id="loader">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+    </div>
+
+    <div id="catalog" class="catalog hidden">
+        
+        <!-- Эвакуаторы -->
+        <div class="card" data-cat="evac">
+            <div class="card-header">
+                <div class="card-title" id="t-evac1">Легковой эвакуатор</div>
+                <div class="card-badge" id="b-evac1">Эвакуация</div>
+            </div>
+            <div class="card-desc" id="d-evac1">Быстрая подача эвакуатора с ломаной или сдвижной платформой для легковых авто.</div>
+            <div class="card-footer">
+                <div class="card-price" id="p-evac1">От 10 000 ₸</div>
+                <button class="select-btn btn-txt" onclick="selectService('evac1')">Заказать</button>
+            </div>
+        </div>
+
+        <div class="card" data-cat="evac">
+            <div class="card-header">
+                <div class="card-title" id="t-evac2">Эвакуатор с манипулятором</div>
+                <div class="card-badge" id="b-evac2">Эвакуация</div>
+            </div>
+            <div class="card-desc" id="d-evac2">Погрузка авто с заблокированными колесами, аварийной техники или спецтехники.</div>
+            <div class="card-footer">
+                <div class="card-price" id="p-evac2">Расчет рейса</div>
+                <button class="select-btn btn-txt" onclick="selectService('evac2')">Заказать</button>
+            </div>
+        </div>
+
+        <!-- Грузовые -->
+        <div class="card" data-cat="city">
+            <div class="card-header">
+                <div class="card-title" id="t-gazel">Газель (до 1.5 - 2 тонн)</div>
+                <div class="card-badge" id="b-gazel">Город</div>
+            </div>
+            <div class="card-desc" id="d-gazel">Малотоннажные перевозки, переезды и подвоз партий товара по городу.</div>
+            <div class="card-footer">
+                <div class="card-price" id="p-gazel">Индивидуально</div>
+                <button class="select-btn btn-txt" onclick="selectService('gazel')">Выбрать</button>
+            </div>
+        </div>
+
+        <div class="card" data-cat="intercity">
+            <div class="card-header">
+                <div class="card-title" id="t-5ton">Пятитонник (до 5 тонн)</div>
+                <div class="card-badge" id="b-5ton">Межгород</div>
+            </div>
+            <div class="card-desc" id="d-5ton">Фургоны и тенты для коммерческих грузов между регионами РК.</div>
+            <div class="card-footer">
+                <div class="card-price" id="p-5ton">По запросу</div>
+                <button class="select-btn btn-txt" onclick="selectService('5ton')">Выбрать</button>
+            </div>
+        </div>
+
+        <div class="card" data-cat="intercity">
+            <div class="card-header">
+                <div class="card-title" id="t-fura">Еврофура (20 тонн)</div>
+                <div class="card-badge" id="b-fura">СНГ / РК</div>
+            </div>
+            <div class="card-desc" id="d-fura">Объем 86–120 м³. Для крупногабаритных и оптовых поставок.</div>
+            <div class="card-footer">
+                <div class="card-price" id="p-fura">Расчет рейса</div>
+                <button class="select-btn btn-txt" onclick="selectService('fura')">Выбрать</button>
+            </div>
+        </div>
+
+        <div class="card" data-cat="spec">
+            <div class="card-header">
+                <div class="card-title" id="t-ref">Рефрижератор</div>
+                <div class="card-badge" id="b-ref">Термо</div>
+            </div>
+            <div class="card-desc" id="d-ref">Поддержание температурного режима от -20°C до +12°C.</div>
+            <div class="card-footer">
+                <div class="card-price" id="p-ref">Индивидуально</div>
+                <button class="select-btn btn-txt" onclick="selectService('ref')">Выбрать</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let currentLang = 'ru';
+
+        const i18n = {
+            ru: {
+                btnSelect: "Выбрать",
+                btnOrder: "Заказать",
+                fAll: "Все услуги",
+                fEvac: "🚨 Эвакуаторы",
+                fCity: "Городские",
+                fIntercity: "Межгород / СНГ",
+                fSpec: "Спецтехника",
+                tEvac1: "Легковой эвакуатор", bEvac1: "Эвакуация", dEvac1: "Быстрая подача эвакуатора с платформой для легковых авто.", pEvac1: "От 10 000 ₸",
+                tEvac2: "Эвакуатор с манипулятором", bEvac2: "Эвакуация", dEvac2: "Погрузка авто с заблокированными колесами или сложных авто.", pEvac2: "Расчет рейса",
+                tGazel: "Газель (до 1.5 - 2 тонн)", bGazel: "Город", dGazel: "Малотоннажные перевозки, переезды и подвоз товара.", pGazel: "Индивидуально",
+                t5ton: "Пятитонник (до 5 тонн)", b5ton: "Межгород", d5ton: "Фургоны и тенты для коммерческих грузов между регионами РК.", p5ton: "По запросу",
+                tFura: "Еврофура (20 тонн)", bFura: "СНГ / РК", dFura: "Объем 86–120 м³. Для крупногабаритных и оптовых поставок.", pFura: "Расчет рейса",
+                tRef: "Рефрижератор", bRef: "Термо", dRef: "Поддержание температурного режима от -20°C до +12°C.", pRef: "Индивидуально"
+            },
+            kk: {
+                btnSelect: "Тандау",
+                btnOrder: "Тапсырыс беру",
+                fAll: "Барлық қызметтер",
+                fEvac: "🚨 Эвакуаторлар",
+                fCity: "Қала ішінде",
+                fIntercity: "Қалааралық / ТМД",
+                fSpec: "Арнайы техника",
+                tEvac1: "Жеңіл авто эвакуаторы", bEvac1: "Эвакуация", dEvac1: "Жеңіл автокөліктерге арналған эвакуаторды жылдам беру.", pEvac1: "10 000 ₸ бастап",
+                tEvac2: "Манипуляторы бар эвакуатор", bEvac2: "Эвакуация", dEvac2: "Дөңгелектері бұғатталған немесе апаттық көліктерді тиеу.", pEvac2: "Есептеу бойынша",
+                tGazel: "Газель (1.5 - 2 тоннаға дейін)", bGazel: "Қала ішінде", dGazel: "Шағын жүк тасымалы, көшу және тауар жеткізу.", pGazel: "Жеке есептеу",
+                t5ton: "Бес тонналық (5 тоннаға дейін)", b5ton: "Қалааралық", d5ton: "ҚР өңірлері арасындағы коммерциялық жүктерге арналған.", p5ton: "Сұраныс бойынша",
+                tFura: "Еврофура (20 тонна)", bFura: "ТМД / ҚР", dFura: "Көлемі 86–120 м³. Ірі көлемді және көтерме жеткізілімдер.", pFura: "Рейсті есептеу",
+                tRef: "Рефрижератор", bRef: "Термо", dRef: "-20°C-тан +12°C-қа дейінгі температуралық режимді сақтау.", pRef: "Жеке есептеу"
+            },
+            en: {
+                btnSelect: "Select",
+                btnOrder: "Order Now",
+                fAll: "All Services",
+                fEvac: "🚨 Tow Trucks",
+                fCity: "City Logistics",
+                fIntercity: "Intercity / CIS",
+                fSpec: "Special Equipment",
+                tEvac1: "Car Tow Truck", bEvac1: "Towing", dEvac1: "Fast dispatch of tow truck with platform for passenger cars.", pEvac1: "From 10,000 ₸",
+                tEvac2: "Crane Tow Truck", bEvac2: "Towing", dEvac2: "Loading vehicles with blocked wheels or heavy damage.", pEvac2: "Calculated",
+                tGazel: "Light Truck (up to 2t)", bGazel: "City", dGazel: "Small tonnage cargo, house moving, and local delivery.", pGazel: "Individual",
+                t5ton: "Medium Truck (up to 5t)", b5ton: "Intercity", d5ton: "Vans and tilt trucks for regional cargo across KZ.", p5ton: "On request",
+                tFura: "Euro Truck (20t)", bFura: "CIS / KZ", dFura: "Volume 86–120 m³. For wholesale and large cargo.", pFura: "Calculated",
+                tRef: "Refrigerated Truck", bRef: "Thermo", dRef: "Temperature control mode from -20°C to +12°C.", pRef: "Individual"
+            }
+        };
+
+        function setLanguage(lang, event) {
+            currentLang = lang;
+            const langBtns = document.querySelectorAll('.lang-btn');
+            langBtns.forEach(b => b.classList.remove('active'));
+            if(event && event.target) event.target.classList.add('active');
+
+            const l = i18n[lang];
+
+            // Перевод фильтров
+            document.getElementById('f-all').innerText = l.fAll;
+            document.getElementById('f-evac').innerText = l.fEvac;
+            document.getElementById('f-city').innerText = l.fCity;
+            document.getElementById('f-intercity').innerText = l.fIntercity;
+            document.getElementById('f-spec').innerText = l.fSpec;
+
+            // Перевод карточек
+            document.getElementById('t-evac1').innerText = l.tEvac1; document.getElementById('b-evac1').innerText = l.bEvac1; document.getElementById('d-evac1').innerText = l.dEvac1; document.getElementById('p-evac1').innerText = l.pEvac1;
+            document.getElementById('t-evac2').innerText = l.tEvac2; document.getElementById('b-evac2').innerText = l.bEvac2; document.getElementById('d-evac2').innerText = l.dEvac2; document.getElementById('p-evac2').innerText = l.pEvac2;
+            document.getElementById('t-gazel').innerText = l.tGazel; document.getElementById('b-gazel').innerText = l.bGazel; document.getElementById('d-gazel').innerText = l.dGazel; document.getElementById('p-gazel').innerText = l.pGazel;
+            document.getElementById('t-5ton').innerText = l.t5ton; document.getElementById('b-5ton').innerText = l.b5ton; document.getElementById('d-5ton').innerText = l.d5ton; document.getElementById('p-5ton').innerText = l.p5ton;
+            document.getElementById('t-fura').innerText = l.tFura; document.getElementById('b-fura').innerText = l.bFura; document.getElementById('d-fura').innerText = l.dFura; document.getElementById('p-fura').innerText = l.pFura;
+            document.getElementById('t-ref').innerText = l.tRef; document.getElementById('b-ref').innerText = l.bRef; document.getElementById('d-ref').innerText = l.dRef; document.getElementById('p-ref').innerText = l.pRef;
+
+            // Кнопки
+            const btns = document.querySelectorAll('.btn-txt');
+            btns.forEach((btn, index) => {
+                btn.innerText = (index < 2) ? l.btnOrder : l.btnSelect;
+            });
+
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        setTimeout(() => {
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('catalog').classList.remove('hidden');
+        }, 300);
+
+        function filterCatalog(category, event) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            if(event && event.target) event.target.classList.add('active');
+
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.cat === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function selectService(serviceKey) {
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            const serviceTitle = i18n[currentLang]['t' + serviceKey.charAt(0).toUpperCase() + serviceKey.slice(1)];
+            tg.sendData(JSON.stringify({ service: serviceTitle, lang: currentLang }));
+        }
+    </script>
+</body>
+</html>
