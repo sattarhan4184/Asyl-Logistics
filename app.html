@@ -14,15 +14,10 @@
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
       --border: #334155;
-      --badge-bg: #0f172a;
+      --input-bg: #0f172a;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -50,11 +45,11 @@
     }
 
     .brand img {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
-      background: #fff;
+      border: 1px solid var(--border);
     }
 
     .brand-title {
@@ -98,9 +93,7 @@
       scrollbar-width: none;
     }
 
-    .categories::-webkit-scrollbar {
-      display: none;
-    }
+    .categories::-webkit-scrollbar { display: none; }
 
     .cat-btn {
       white-space: nowrap;
@@ -142,25 +135,18 @@
       align-items: flex-start;
     }
 
-    .card-title {
-      font-size: 15px;
-      font-weight: 600;
-    }
+    .card-title { font-size: 15px; font-weight: 600; }
 
     .card-badge {
       font-size: 10px;
       color: var(--text-sub);
-      background: var(--badge-bg);
+      background: var(--bg-color);
       padding: 3px 6px;
       border-radius: 4px;
       border: 1px solid var(--border);
     }
 
-    .card-desc {
-      font-size: 12px;
-      color: var(--text-sub);
-      line-height: 1.4;
-    }
+    .card-desc { font-size: 12px; color: var(--text-sub); line-height: 1.4; }
 
     .card-footer {
       display: flex;
@@ -169,11 +155,7 @@
       margin-top: 4px;
     }
 
-    .card-price {
-      font-size: 14px;
-      font-weight: 700;
-      color: #38bdf8;
-    }
+    .card-price { font-size: 14px; font-weight: 700; color: #38bdf8; }
 
     .select-btn {
       background: var(--accent);
@@ -186,8 +168,100 @@
       cursor: pointer;
     }
 
-    .select-btn:active {
-      background: var(--accent-hover);
+    .select-btn:active { background: var(--accent-hover); }
+
+    /* Modal / Form Order */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 480px;
+      padding: 20px;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title { font-size: 16px; font-weight: 700; }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-group input:focus { border-color: var(--accent); }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+
+    /* Success Screen */
+    .success-box {
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .success-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
     }
   </style>
 </head>
@@ -196,7 +270,7 @@
   <!-- Header -->
   <div class="header">
     <div class="brand">
-      <img src="https://raw.githubusercontent.com/sattarhan4184/Asyl-Logistics/main/logo.png" alt="Logo" onerror="this.src='https://via.placeholder.com/36?text=AL'">
+      <img src="https://raw.githubusercontent.com/sattarhan4184/Asyl-Logistics/main/logo.png" alt="Logo" onerror="this.src='https://via.placeholder.com/40?text=AL'">
       <div class="brand-title">ASYL LOGISTICS</div>
     </div>
     <div class="lang-switcher">
@@ -218,7 +292,6 @@
   <!-- Services List -->
   <div class="card-list">
 
-    <!-- Легковой эвакуатор -->
     <div class="card" data-cat="evac">
       <div class="card-header">
         <div class="card-title" id="t-evac1">Легковой эвакуатор</div>
@@ -227,11 +300,10 @@
       <div class="card-desc" id="d-evac1">Перевозка автомобилей по городу и межгороду.</div>
       <div class="card-footer">
         <div class="card-price" id="p-evac1">Договорная</div>
-        <button class="select-btn" onclick="selectService('Легковой эвакуатор')">Заказать</button>
+        <button class="select-btn" onclick="openOrderModal('Легковой эвакуатор')">Заказать</button>
       </div>
     </div>
 
-    <!-- Эвакуатор с манипулятором -->
     <div class="card" data-cat="evac">
       <div class="card-header">
         <div class="card-title" id="t-evac2">Эвакуатор с манипулятором</div>
@@ -240,11 +312,10 @@
       <div class="card-desc" id="d-evac2">Погрузка и транспортировка авто или техники.</div>
       <div class="card-footer">
         <div class="card-price" id="p-evac2">Расчет рейса</div>
-        <button class="select-btn" onclick="selectService('Эвакуатор с манипулятором')">Заказать</button>
+        <button class="select-btn" onclick="openOrderModal('Эвакуатор с манипулятором')">Заказать</button>
       </div>
     </div>
 
-    <!-- Газель -->
     <div class="card" data-cat="city">
       <div class="card-header">
         <div class="card-title" id="t-gazel">Газель (до 1.5 - 2 тонн)</div>
@@ -253,11 +324,10 @@
       <div class="card-desc" id="d-gazel">Малотоннажные грузоперевозки и переезды.</div>
       <div class="card-footer">
         <div class="card-price" id="p-gazel">Договорная</div>
-        <button class="select-btn" onclick="selectService('Газель (до 2т)')">Выбрать</button>
+        <button class="select-btn" onclick="openOrderModal('Газель (до 2т)')">Выбрать</button>
       </div>
     </div>
 
-    <!-- Пятитонник -->
     <div class="card" data-cat="intercity">
       <div class="card-header">
         <div class="card-title" id="t-5ton">Пятитонник (до 5 тонн)</div>
@@ -266,11 +336,10 @@
       <div class="card-desc" id="d-5ton">Перевозка коммерческих и частных грузов.</div>
       <div class="card-footer">
         <div class="card-price" id="p-5ton">Договорная</div>
-        <button class="select-btn" onclick="selectService('Пятитонник (до 5т)')">Выбрать</button>
+        <button class="select-btn" onclick="openOrderModal('Пятитонник (до 5т)')">Выбрать</button>
       </div>
     </div>
 
-    <!-- Еврофура -->
     <div class="card" data-cat="intercity">
       <div class="card-header">
         <div class="card-title" id="t-fura">Еврофура (20 тонн)</div>
@@ -279,11 +348,10 @@
       <div class="card-desc" id="d-fura">Крупногабаритные и оптовые поставки грузов.</div>
       <div class="card-footer">
         <div class="card-price" id="p-fura">Расчет рейса</div>
-        <button class="select-btn" onclick="selectService('Еврофура (20т)')">Выбрать</button>
+        <button class="select-btn" onclick="openOrderModal('Еврофура (20т)')">Выбрать</button>
       </div>
     </div>
 
-    <!-- Рефрижератор -->
     <div class="card" data-cat="spec">
       <div class="card-header">
         <div class="card-title" id="t-ref">Рефрижератор</div>
@@ -292,10 +360,47 @@
       <div class="card-desc" id="d-ref">Перевозка грузов с особыми условиями хранения.</div>
       <div class="card-footer">
         <div class="card-price" id="p-ref">Расчет рейса</div>
-        <button class="select-btn" onclick="selectService('Рефрижератор')">Выбрать</button>
+        <button class="select-btn" onclick="openOrderModal('Рефрижератор')">Выбрать</button>
       </div>
     </div>
 
+  </div>
+
+  <!-- Modal Form -->
+  <div class="modal-overlay" id="orderModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-service-title">Оформление заявки</div>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+
+      <div id="form-container">
+        <div class="form-group">
+          <label id="lbl-name">Ваше имя:</label>
+          <input type="text" id="cust-name" placeholder="Ерлан">
+        </div>
+        <div class="form-group">
+          <label id="lbl-phone">Номер телефона:</label>
+          <input type="tel" id="cust-phone" placeholder="+7 700 000 00 00">
+        </div>
+        <div class="form-group">
+          <label id="lbl-from">Откуда (Откуда забрать):</label>
+          <input type="text" id="cust-from" placeholder="Алматы, Абая 10">
+        </div>
+        <div class="form-group">
+          <label id="lbl-to">Куда (Точка назначения):</label>
+          <input type="text" id="cust-to" placeholder="Астана, Достык 5">
+        </div>
+        <button class="submit-btn" onclick="sendOrder()" id="btn-submit">Отправить заявку</button>
+      </div>
+
+      <div id="success-container" style="display: none;" class="success-box">
+        <div class="success-icon">✅</div>
+        <h3 id="succ-title">Заявка успешно отправлена!</h3>
+        <p id="succ-desc" style="color: var(--text-sub); font-size: 13px; margin-top: 6px;">Наш диспетчер свяжется с вами в течение 5 минут.</p>
+      </div>
+
+    </div>
   </div>
 
   <script>
@@ -304,6 +409,9 @@
       tg.expand();
       tg.ready();
     }
+
+    let selectedService = '';
+    let currentLang = 'rus';
 
     const dict = {
       rus: {
@@ -314,7 +422,9 @@
         t5ton: "Пятитонник (до 5 тонн)", b5ton: "Межгород", d5ton: "Перевозка коммерческих и частных грузов.", p5ton: "Договорная",
         tFura: "Еврофура (20 тонн)", bFura: "СНГ / РК", dFura: "Крупногабаритные и оптовые поставки грузов.", pFura: "Расчет рейса",
         tRef: "Рефрижератор", bRef: "Термо", dRef: "Перевозка грузов с особыми условиями хранения.", pRef: "Расчет рейса",
-        btnSelect: "Заказать"
+        btnSelect: "Заказать",
+        lblName: "Ваше имя:", lblPhone: "Номер телефона:", lblFrom: "Откуда (Откуда забрать):", lblTo: "Куда (Точка назначения):",
+        btnSubmit: "Отправить заявку", succTitle: "Заявка успешно отправлена!", succDesc: "Наш диспетчер свяжется с вами в течение 5 минут."
       },
       kaz: {
         catAll: "Барлық қызметтер", catEvac: "🚨 Эвакуаторлар", catCity: "Қала ішінде", catInter: "Қалааралық / ТМД", catSpec: "Арнайы техника",
@@ -324,7 +434,9 @@
         t5ton: "Бестонналық (5 тоннаға дейін)", b5ton: "Қалааралық", d5ton: "Коммерциялық және жеке жүктерді тасымалдау.", p5ton: "Келісімді",
         tFura: "Еурофура (20 тонна)", bFura: "ТМД / ҚР", dFura: "Ірі көлемді және көтерме жүк жеткізілімдері.", pFura: "Рейсті есептеу",
         tRef: "Рефрижератор", bRef: "Термо", dRef: "Арнайы сақтау шарттарын талап ететін жүктерді тасымалдау.", pRef: "Рейсті есептеу",
-        btnSelect: "Тапсырыс беру"
+        btnSelect: "Тапсырыс беру",
+        lblName: "Сіздің атыңыз:", lblPhone: "Телефон нөміріңіз:", lblFrom: "Қайдан (Алып кету орны):", lblTo: "Қайда (Жету нүктесі):",
+        btnSubmit: "Тапсырысты жіберу", succTitle: "Тапсырыс сәтті жіберілді!", succDesc: "Біздің диспетчер сізбен 5 минут ішінде хабарласады."
       },
       eng: {
         catAll: "All Services", catEvac: "🚨 Tow Trucks", catCity: "City Logistics", catInter: "Intercity / CIS", catSpec: "Special Machinery",
@@ -334,11 +446,14 @@
         t5ton: "Medium Truck (up to 5t)", b5ton: "Intercity", d5ton: "Commercial and private cargo transportation.", p5ton: "Negotiable",
         tFura: "Semi-Truck (20 tons)", bFura: "CIS / KZ", dFura: "Bulk and wholesale cargo deliveries.", pFura: "Calculated",
         tRef: "Refrigerated Truck", bRef: "Thermo", dRef: "Transportation of cargo with special storage requirements.", pRef: "Calculated",
-        btnSelect: "Order"
+        btnSelect: "Order",
+        lblName: "Your Name:", lblPhone: "Phone Number:", lblFrom: "Pickup Location:", lblTo: "Destination Location:",
+        btnSubmit: "Submit Order", succTitle: "Order Submitted Successfully!", succDesc: "Our dispatcher will contact you within 5 minutes."
       }
     };
 
     function setLang(lang) {
+      currentLang = lang;
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`btn-${lang}`).classList.add('active');
 
@@ -380,6 +495,14 @@
       document.getElementById('p-ref').innerText = t.pRef;
 
       document.querySelectorAll('.select-btn').forEach(btn => btn.innerText = t.btnSelect);
+
+      document.getElementById('lbl-name').innerText = t.lblName;
+      document.getElementById('lbl-phone').innerText = t.lblPhone;
+      document.getElementById('lbl-from').innerText = t.lblFrom;
+      document.getElementById('lbl-to').innerText = t.lblTo;
+      document.getElementById('btn-submit').innerText = t.btnSubmit;
+      document.getElementById('succ-title').innerText = t.succTitle;
+      document.getElementById('succ-desc').innerText = t.succDesc;
     }
 
     function filterCat(cat, btn) {
@@ -395,15 +518,50 @@
       });
     }
 
-    function selectService(serviceName) {
-      const payload = { service: serviceName, timestamp: new Date().toISOString() };
-      if (tg && tg.sendData) {
-        tg.sendData(JSON.stringify(payload));
-      } else {
-        alert("Выбрана услуга: " + serviceName + "\n(При открытии из Telegram эта заявка сразу отправится боту)");
+    function openOrderModal(serviceName) {
+      selectedService = serviceName;
+      document.getElementById('modal-service-title').innerText = serviceName;
+      document.getElementById('form-container').style.display = 'block';
+      document.getElementById('success-container').style.display = 'none';
+      document.getElementById('orderModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('orderModal').classList.remove('active');
+    }
+
+    function sendOrder() {
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const from = document.getElementById('cust-from').value.trim();
+      const to = document.getElementById('cust-to').value.trim();
+
+      if (!name || !phone) {
+        alert("Пожалуйста, укажите имя и номер телефона!");
+        return;
       }
+
+      const payload = {
+        service: selectedService,
+        name: name,
+        phone: phone,
+        from: from || "Не указано",
+        to: to || "Не указано",
+        timestamp: new Date().toISOString()
+      };
+
+      document.getElementById('form-container').style.display = 'none';
+      document.getElementById('success-container').style.display = 'block';
+
+      setTimeout(() => {
+        if (tg && tg.sendData) {
+          tg.sendData(JSON.stringify(payload));
+        } else {
+          alert("Данные для бота: " + JSON.stringify(payload));
+          closeModal();
+        }
+      }, 1500);
     }
   </script>
 </body>
-</html>
 </html>
