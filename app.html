@@ -1,567 +1,177 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ASYL LOGISTICS</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      --border: #334155;
-      --input-bg: #0f172a;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASYL LOGISTICS — Каталог услуг</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      max-width: 480px;
-      margin: 0 auto;
-      min-height: 100vh;
-      padding: 16px;
-      padding-bottom: 24px;
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
 
-    /* Header */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
+        .logo-img {
+            max-width: 140px;
+            height: auto;
+            margin-bottom: 12px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            color: #ffffff;
+        }
 
-    .brand img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid var(--border);
-    }
+        .header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+        }
 
-    .brand-title {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
 
-    /* Language Switcher */
-    .lang-switcher {
-      display: flex;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 2px;
-    }
+        @media (min-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
 
-    .lang-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-sub);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 5px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .lang-btn.active {
-      background: var(--accent);
-      color: #fff;
-    }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #ffffff;
+        }
 
-    /* Categories Horizontal Scroll */
-    .categories {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
-      scrollbar-width: none;
-    }
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0 0 16px 0;
+            line-height: 1.4;
+        }
 
-    .categories::-webkit-scrollbar { display: none; }
+        .btn-select {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
 
-    .cat-btn {
-      white-space: nowrap;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--text-sub);
-      font-size: 13px;
-      padding: 8px 14px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-
-    .cat-btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    /* Cards */
-    .card-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .card-title { font-size: 15px; font-weight: 600; }
-
-    .card-badge {
-      font-size: 10px;
-      color: var(--text-sub);
-      background: var(--bg-color);
-      padding: 3px 6px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
-
-    .card-desc { font-size: 12px; color: var(--text-sub); line-height: 1.4; }
-
-    .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 4px;
-    }
-
-    .card-price { font-size: 14px; font-weight: 700; color: #38bdf8; }
-
-    .select-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .select-btn:active { background: var(--accent-hover); }
-
-    /* Modal / Form Order */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .modal-overlay.active { display: flex; }
-
-    .modal {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 20px 20px 0 0;
-      width: 100%;
-      max-width: 480px;
-      padding: 20px;
-      animation: slideUp 0.3s ease-out;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .modal-title { font-size: 16px; font-weight: 700; }
-
-    .close-btn {
-      background: none;
-      border: none;
-      color: var(--text-sub);
-      font-size: 20px;
-      cursor: pointer;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      color: var(--text-sub);
-      margin-bottom: 4px;
-    }
-
-    .form-group input {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .form-group input:focus { border-color: var(--accent); }
-
-    .submit-btn {
-      width: 100%;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      margin-top: 8px;
-      cursor: pointer;
-    }
-
-    /* Success Screen */
-    .success-box {
-      text-align: center;
-      padding: 30px 10px;
-    }
-
-    .success-icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
-  </style>
+        .btn-select:active {
+            background-color: var(--accent-hover);
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="brand">
-      <img src="https://sattarhan4184.github.io/Asyl-Logistics/logo.png" alt="Logo" onerror="this.src='https://sattarhan4184.github.io/Asyl-Logistics/logo.jpg'">
-      <div class="brand-title">ASYL LOGISTICS</div>
-    </div>
-    <div class="lang-switcher">
-      <button class="lang-btn" onclick="setLang('kaz')" id="btn-kaz">ҚАЗ</button>
-      <button class="lang-btn active" onclick="setLang('rus')" id="btn-rus">РУС</button>
-      <button class="lang-btn" onclick="setLang('eng')" id="btn-eng">ENG</button>
-    </div>
-  </div>
-
-  <!-- Categories -->
-  <div class="categories">
-    <button class="cat-btn active" onclick="filterCat('all', this)" id="cat-all">Все услуги</button>
-    <button class="cat-btn" onclick="filterCat('evac', this)" id="cat-evac">🚨 Эвакуаторы</button>
-    <button class="cat-btn" onclick="filterCat('city', this)" id="cat-city">Городские</button>
-    <button class="cat-btn" onclick="filterCat('intercity', this)" id="cat-intercity">Межгород / СНГ</button>
-    <button class="cat-btn" onclick="filterCat('spec', this)" id="cat-spec">Спецтехника</button>
-  </div>
-
-  <!-- Services List -->
-  <div class="card-list">
-
-    <div class="card" data-cat="evac">
-      <div class="card-header">
-        <div class="card-title" id="t-evac1">Легковой эвакуатор</div>
-        <div class="card-badge" id="b-evac1">Эвакуация</div>
-      </div>
-      <div class="card-desc" id="d-evac1">Перевозка автомобилей по городу и межгороду.</div>
-      <div class="card-footer">
-        <div class="card-price" id="p-evac1">Договорная</div>
-        <button class="select-btn" onclick="openOrderModal('Легковой эвакуатор')">Заказать</button>
-      </div>
+    <div class="header">
+        <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+        <h1>ASYL LOGISTICS</h1>
+        <p>Выберите категорию транспорта для расчета стоимости</p>
     </div>
 
-    <div class="card" data-cat="evac">
-      <div class="card-header">
-        <div class="card-title" id="t-evac2">Эвакуатор с манипулятором</div>
-        <div class="card-badge" id="b-evac2">Эвакуация</div>
-      </div>
-      <div class="card-desc" id="d-evac2">Погрузка и транспортировка авто или техники.</div>
-      <div class="card-footer">
-        <div class="card-price" id="p-evac2">Расчет рейса</div>
-        <button class="select-btn" onclick="openOrderModal('Эвакуатор с манипулятором')">Заказать</button>
-      </div>
-    </div>
-
-    <div class="card" data-cat="city">
-      <div class="card-header">
-        <div class="card-title" id="t-gazel">Газель (до 1.5 - 2 тонн)</div>
-        <div class="card-badge" id="b-gazel">Город</div>
-      </div>
-      <div class="card-desc" id="d-gazel">Малотоннажные грузоперевозки и переезды.</div>
-      <div class="card-footer">
-        <div class="card-price" id="p-gazel">Договорная</div>
-        <button class="select-btn" onclick="openOrderModal('Газель (до 2т)')">Выбрать</button>
-      </div>
-    </div>
-
-    <div class="card" data-cat="intercity">
-      <div class="card-header">
-        <div class="card-title" id="t-5ton">Пятитонник (до 5 тонн)</div>
-        <div class="card-badge" id="b-5ton">Межгород</div>
-      </div>
-      <div class="card-desc" id="d-5ton">Перевозка коммерческих и частных грузов.</div>
-      <div class="card-footer">
-        <div class="card-price" id="p-5ton">Договорная</div>
-        <button class="select-btn" onclick="openOrderModal('Пятитонник (до 5т)')">Выбрать</button>
-      </div>
-    </div>
-
-    <div class="card" data-cat="intercity">
-      <div class="card-header">
-        <div class="card-title" id="t-fura">Еврофура (20 тонн)</div>
-        <div class="card-badge" id="b-fura">СНГ / РК</div>
-      </div>
-      <div class="card-desc" id="d-fura">Крупногабаритные и оптовые поставки грузов.</div>
-      <div class="card-footer">
-        <div class="card-price" id="p-fura">Расчет рейса</div>
-        <button class="select-btn" onclick="openOrderModal('Еврофура (20т)')">Выбрать</button>
-      </div>
-    </div>
-
-    <div class="card" data-cat="spec">
-      <div class="card-header">
-        <div class="card-title" id="t-ref">Рефрижератор</div>
-        <div class="card-badge" id="b-ref">Термо</div>
-      </div>
-      <div class="card-desc" id="d-ref">Перевозка грузов с особыми условиями хранения.</div>
-      <div class="card-footer">
-        <div class="card-price" id="p-ref">Расчет рейса</div>
-        <button class="select-btn" onclick="openOrderModal('Рефрижератор')">Выбрать</button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Modal Form -->
-  <div class="modal-overlay" id="orderModal">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title" id="modal-service-title">Оформление заявки</div>
-        <button class="close-btn" onclick="closeModal()">✕</button>
-      </div>
-
-      <div id="form-container">
-        <div class="form-group">
-          <label id="lbl-name">Ваше имя:</label>
-          <input type="text" id="cust-name" placeholder="Ерлан">
+    <div class="grid">
+        <div class="card">
+            <div>
+                <h2 class="card-title">🚗 Легковой эвакуатор</h2>
+                <p class="card-desc">Эвакуация и транспортировка легковых автомобилей, кроссоверов и мототехники.</p>
+            </div>
+            <button class="btn-select" onclick="selectService('Легковой эвакуатор')">Выбрать</button>
         </div>
-        <div class="form-group">
-          <label id="lbl-phone">Номер телефона:</label>
-          <input type="tel" id="cust-phone" placeholder="+7 700 000 00 00">
-        </div>
-        <div class="form-group">
-          <label id="lbl-from">Откуда (Откуда забрать):</label>
-          <input type="text" id="cust-from" placeholder="Алматы, Абая 10">
-        </div>
-        <div class="form-group">
-          <label id="lbl-to">Куда (Точка назначения):</label>
-          <input type="text" id="cust-to" placeholder="Астана, Достык 5">
-        </div>
-        <button class="submit-btn" onclick="sendOrder()" id="btn-submit">Отправить заявку</button>
-      </div>
 
-      <div id="success-container" style="display: none;" class="success-box">
-        <div class="success-icon">✅</div>
-        <h3 id="succ-title">Заявка успешно отправлена!</h3>
-        <p id="succ-desc" style="color: var(--text-sub); font-size: 13px; margin-top: 6px;">Наш диспетчер свяжется с вами в течение 5 минут.</p>
-      </div>
+        <div class="card">
+            <div>
+                <h2 class="card-title">🏗️ Эвакуатор с манипулятором</h2>
+                <p class="card-desc">Погрузка и перевозка аварийных авто, спецтехники и сложного багажа.</p>
+            </div>
+            <button class="btn-select" onclick="selectService('Эвакуатор с манипулятором')">Выбрать</button>
+        </div>
 
+        <div class="card">
+            <div>
+                <h2 class="card-title">🚐 Малотоннажный транспорт (до 3 т)</h2>
+                <p class="card-desc">Газели, фургоны и микроавтобусы для личных и коммерческих грузов.</p>
+            </div>
+            <button class="btn-select" onclick="selectService('Малотоннажный транспорт (до 3 т)')">Выбрать</button>
+        </div>
+
+        <div class="card">
+            <div>
+                <h2 class="card-title">🚚 Среднетоннажный транспорт (до 10 т)</h2>
+                <p class="card-desc">Грузовые автомобили для перевозки объёмных партий товаров и оборудования.</p>
+            </div>
+            <button class="btn-select" onclick="selectService('Среднетоннажный транспорт (до 10 т)')">Выбрать</button>
+        </div>
+
+        <div class="card">
+            <div>
+                <h2 class="card-title">🚛 Большегрузный транспорт / Фуры (до 20 т)</h2>
+                <p class="card-desc">Еврофуры, тенты и рефрижераторы для масштабных логистических задач.</p>
+            </div>
+            <button class="btn-select" onclick="selectService('Большегрузный транспорт (до 20 т)')">Выбрать</button>
+        </div>
+
+        <div class="card">
+            <div>
+                <h2 class="card-title">🚜 Спецтехника и Негабарит</h2>
+                <p class="card-desc">Тралы и спецплатформы для негабаритных грузов и промышленного оборудования.</p>
+            </div>
+            <button class="btn-select" onclick="selectService('Спецтехника и Негабарит')">Выбрать</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.expand();
-      tg.ready();
-    }
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-    let selectedService = '';
-    let currentLang = 'rus';
-
-    const dict = {
-      rus: {
-        catAll: "Все услуги", catEvac: "🚨 Эвакуаторы", catCity: "Городские", catInter: "Межгород / СНГ", catSpec: "Спецтехника",
-        tEvac1: "Легковой эвакуатор", bEvac1: "Эвакуация", dEvac1: "Перевозка автомобилей по городу и межгороду.", pEvac1: "Договорная",
-        tEvac2: "Эвакуатор с манипулятором", bEvac2: "Эвакуация", dEvac2: "Погрузка и транспортировка авто или техники.", pEvac2: "Расчет рейса",
-        tGazel: "Газель (до 1.5 - 2 тонн)", bGazel: "Город", dGazel: "Малотоннажные грузоперевозки и переезды.", pGazel: "Договорная",
-        t5ton: "Пятитонник (до 5 тонн)", b5ton: "Межгород", d5ton: "Перевозка коммерческих и частных грузов.", p5ton: "Договорная",
-        tFura: "Еврофура (20 тонн)", bFura: "СНГ / РК", dFura: "Крупногабаритные и оптовые поставки грузов.", pFura: "Расчет рейса",
-        tRef: "Рефрижератор", bRef: "Термо", dRef: "Перевозка грузов с особыми условиями хранения.", pRef: "Расчет рейса",
-        btnSelect: "Заказать",
-        lblName: "Ваше имя:", lblPhone: "Номер телефона:", lblFrom: "Откуда (Откуда забрать):", lblTo: "Куда (Точка назначения):",
-        btnSubmit: "Отправить заявку", succTitle: "Заявка успешно отправлена!", succDesc: "Наш диспетчер свяжется с вами в течение 5 минут."
-      },
-      kaz: {
-        catAll: "Барлық қызметтер", catEvac: "🚨 Эвакуаторлар", catCity: "Қала ішінде", catInter: "Қалааралық / ТМД", catSpec: "Арнайы техника",
-        tEvac1: "Жеңіл эвакуатор", bEvac1: "Эвакуация", dEvac1: "Қала және қалааралық бойынша автокөліктерді тасымалдау.", pEvac1: "Келісімді",
-        tEvac2: "Манипуляторы бар эвакуатор", bEvac2: "Эвакуация", dEvac2: "Автокөліктерді немесе техниканы тиеу және тасымалдау.", pEvac2: "Рейсті есептеу",
-        tGazel: "Газель (1.5 - 2 тоннаға дейін)", bGazel: "Қала", dGazel: "Шағын тонналы жүк тасымалдары және көшу.", pGazel: "Келісімді",
-        t5ton: "Бестонналық (5 тоннаға дейін)", b5ton: "Қалааралық", d5ton: "Коммерциялық және жеке жүктерді тасымалдау.", p5ton: "Келісімді",
-        tFura: "Еурофура (20 тонна)", bFura: "ТМД / ҚР", dFura: "Ірі көлемді және көтерме жүк жеткізілімдері.", pFura: "Рейсті есептеу",
-        tRef: "Рефрижератор", bRef: "Термо", dRef: "Арнайы сақтау шарттарын талап ететін жүктерді тасымалдау.", pRef: "Рейсті есептеу",
-        btnSelect: "Тапсырыс беру",
-        lblName: "Сіздің атыңыз:", lblPhone: "Телефон нөміріңіз:", lblFrom: "Қайдан (Алып кету орны):", lblTo: "Қайда (Жету нүктесі):",
-        btnSubmit: "Тапсырысты жіберу", succTitle: "Тапсырыс сәтті жіберілді!", succDesc: "Біздің диспетчер сізбен 5 минут ішінде хабарласады."
-      },
-      eng: {
-        catAll: "All Services", catEvac: "🚨 Tow Trucks", catCity: "City Logistics", catInter: "Intercity / CIS", catSpec: "Special Machinery",
-        tEvac1: "Light Tow Truck", bEvac1: "Evacuation", dEvac1: "Vehicle transportation in city and intercity.", pEvac1: "Negotiable",
-        tEvac2: "Crane Tow Truck", bEvac2: "Evacuation", dEvac2: "Loading and transport of cars or equipment.", pEvac2: "Calculated",
-        tGazel: "Light Truck (up to 2t)", bGazel: "City", dGazel: "Local light freight and moving.", pGazel: "Negotiable",
-        t5ton: "Medium Truck (up to 5t)", b5ton: "Intercity", d5ton: "Commercial and private cargo transportation.", p5ton: "Negotiable",
-        tFura: "Semi-Truck (20 tons)", bFura: "CIS / KZ", dFura: "Bulk and wholesale cargo deliveries.", pFura: "Calculated",
-        tRef: "Refrigerated Truck", bRef: "Thermo", dRef: "Transportation of cargo with special storage requirements.", pRef: "Calculated",
-        btnSelect: "Order",
-        lblName: "Your Name:", lblPhone: "Phone Number:", lblFrom: "Pickup Location:", lblTo: "Destination Location:",
-        btnSubmit: "Submit Order", succTitle: "Order Submitted Successfully!", succDesc: "Our dispatcher will contact you within 5 minutes."
-      }
-    };
-
-    function setLang(lang) {
-      currentLang = lang;
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`btn-${lang}`).classList.add('active');
-
-      const t = dict[lang];
-      document.getElementById('cat-all').innerText = t.catAll;
-      document.getElementById('cat-evac').innerText = t.catEvac;
-      document.getElementById('cat-city').innerText = t.catCity;
-      document.getElementById('cat-intercity').innerText = t.catInter;
-      document.getElementById('cat-spec').innerText = t.catSpec;
-
-      document.getElementById('t-evac1').innerText = t.tEvac1;
-      document.getElementById('b-evac1').innerText = t.bEvac1;
-      document.getElementById('d-evac1').innerText = t.dEvac1;
-      document.getElementById('p-evac1').innerText = t.pEvac1;
-
-      document.getElementById('t-evac2').innerText = t.tEvac2;
-      document.getElementById('b-evac2').innerText = t.bEvac2;
-      document.getElementById('d-evac2').innerText = t.dEvac2;
-      document.getElementById('p-evac2').innerText = t.pEvac2;
-
-      document.getElementById('t-gazel').innerText = t.tGazel;
-      document.getElementById('b-gazel').innerText = t.bGazel;
-      document.getElementById('d-gazel').innerText = t.dGazel;
-      document.getElementById('p-gazel').innerText = t.pGazel;
-
-      document.getElementById('t-5ton').innerText = t.t5ton;
-      document.getElementById('b-5ton').innerText = t.b5ton;
-      document.getElementById('d-5ton').innerText = t.d5ton;
-      document.getElementById('p-5ton').innerText = t.p5ton;
-
-      document.getElementById('t-fura').innerText = t.tFura;
-      document.getElementById('b-fura').innerText = t.bFura;
-      document.getElementById('d-fura').innerText = t.dFura;
-      document.getElementById('p-fura').innerText = t.pFura;
-
-      document.getElementById('t-ref').innerText = t.tRef;
-      document.getElementById('b-ref').innerText = t.bRef;
-      document.getElementById('d-ref').innerText = t.dRef;
-      document.getElementById('p-ref').innerText = t.pRef;
-
-      document.querySelectorAll('.select-btn').forEach(btn => btn.innerText = t.btnSelect);
-
-      document.getElementById('lbl-name').innerText = t.lblName;
-      document.getElementById('lbl-phone').innerText = t.lblPhone;
-      document.getElementById('lbl-from').innerText = t.lblFrom;
-      document.getElementById('lbl-to').innerText = t.lblTo;
-      document.getElementById('btn-submit').innerText = t.btnSubmit;
-      document.getElementById('succ-title').innerText = t.succTitle;
-      document.getElementById('succ-desc').innerText = t.succDesc;
-    }
-
-    function filterCat(cat, btn) {
-      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      document.querySelectorAll('.card').forEach(card => {
-        if (cat === 'all' || card.dataset.cat === cat) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
+        function selectService(serviceName) {
+            const data = { service: serviceName };
+            tg.sendData(JSON.stringify(data));
         }
-      });
-    }
-
-    function openOrderModal(serviceName) {
-      selectedService = serviceName;
-      document.getElementById('modal-service-title').innerText = serviceName;
-      document.getElementById('form-container').style.display = 'block';
-      document.getElementById('success-container').style.display = 'none';
-      document.getElementById('orderModal').classList.add('active');
-    }
-
-    function closeModal() {
-      document.getElementById('orderModal').classList.remove('active');
-    }
-
-    function sendOrder() {
-      const name = document.getElementById('cust-name').value.trim();
-      const phone = document.getElementById('cust-phone').value.trim();
-      const from = document.getElementById('cust-from').value.trim();
-      const to = document.getElementById('cust-to').value.trim();
-
-      if (!name || !phone) {
-        alert("Пожалуйста, укажите имя и номер телефона!");
-        return;
-      }
-
-      const payload = {
-        service: selectedService,
-        name: name,
-        phone: phone,
-        from: from || "Не указано",
-        to: to || "Не указано",
-        timestamp: new Date().toISOString()
-      };
-
-      document.getElementById('form-container').style.display = 'none';
-      document.getElementById('success-container').style.display = 'block';
-
-      setTimeout(() => {
-        if (tg && tg.sendData) {
-          tg.sendData(JSON.stringify(payload));
-        } else {
-          alert("Данные для бота: " + JSON.stringify(payload));
-          closeModal();
-        }
-      }, 1500);
-    }
-  </script>
+    </script>
 </body>
 </html>
